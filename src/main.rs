@@ -65,7 +65,7 @@ fn main() {
         name_el: Arc::new(element::Name::root_default()),
         disamb_count: 0,
     };
-    let ir = crate::disamb::element_ref_ir_impl(&db.style.citation.layout.elements[0], &db, &ctx);
+    let _ir = crate::disamb::element_ref_ir_impl(&db.style.citation.layout.elements[0], &db, &ctx);
 
     // let mut nfa = crate::disamb::Nfa::new();
     // let first = nfa.graph.add_node(());

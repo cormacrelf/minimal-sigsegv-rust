@@ -17,28 +17,16 @@ use crate::element::*;
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EdgeData {
     Output(String),
-
-    // The rest are synchronised with fields on CiteContext and IR.
     Locator,
     NotUsed,
     LocatorLabel,
-
-    /// TODO: add a parameter to Dfa::accepts_data to supply the actual year suffix for the particular reference.
     YearSuffix,
-
-    /// Not for DFA matching, must be turned into YearSuffix via `RefIR::keep_first_ysh` before DFA construction
     YearSuffixExplicit,
-    /// Not for DFA matching, must be turned into YearSuffix via `RefIR::keep_first_ysh` before DFA construction
     YearSuffixPlain,
-
     CitationNumber,
     CitationNumberLabel,
-
-    // TODO: treat this specially? Does it help you disambiguate back-referencing cites?
     Frnn,
     FrnnLabel,
-
-    /// The accessed date, which should not help disambiguate cites.
     Accessed,
 }
 
@@ -82,17 +70,12 @@ fn ref_sequence<'c>(
     let mut contents = Vec::with_capacity(els.len());
     let mut overall_gv = GroupVars::new();
 
-    // let mut dropped_gv = GroupVars::new();
-    // let els_ptr = els.as_ptr();
-    // eprintln!("els_ptr {:x}", els_ptr as usize);
-
     for el in els {
         let (got_ir, gv) =
             crate::disamb::element_ref_ir_impl(el, db, ctx);
             eprintln!("{:?}", got_ir);
         match got_ir {
             RefIR::Edge(None) => {
-                // dropped_gv = dropped_gv.neighbour(gv);
                 overall_gv = overall_gv.neighbour(gv);
             }
             _ => {
@@ -102,7 +85,7 @@ fn ref_sequence<'c>(
         }
     }
 
-    if !contents.iter().any(|x| !matches!(x,  RefIR::Edge(None))) {
+    if !contents.iter().any(|x| *x != RefIR::Edge(None)) {
         (RefIR::Edge(None), overall_gv)
     } else {
         (
